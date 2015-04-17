@@ -36,36 +36,36 @@ public class QueryProcessor {
 		
 		String postArray[];
 		String docName;
-		ArrayList<Document> tDocList;
-		HashMap<String,Document> docMap = new HashMap<String,Document>();
+		ArrayList<WeightedDocument> tDocList;
+		HashMap<String,WeightedDocument> docMap = new HashMap<String,WeightedDocument>();
 		
 		double weight;
 		double w;
 		String tempName;
 		for(String t:tArray){
 			tDocList = this.index.getWeights(t);
-			for(Document d:tDocList){
-				tempName = d.getFileName();
+			for(WeightedDocument d:tDocList){
+				tempName = d.getName();
 				weight = d.getWeight();
 				if(docMap.containsKey(tempName)){
 					w = docMap.get(tempName).getWeight();
 					docMap.get(tempName).setWeight(w+weight);
 				}else{
-					docMap.put(tempName, new Document(tempName,weight));
+					docMap.put(tempName, new WeightedDocument(tempName,weight));
 				}
 			}
 		}
 		
-		ArrayList<Document> docList = new ArrayList<Document>();
+		ArrayList<WeightedDocument> docList = new ArrayList<WeightedDocument>();
 		
 		for(String s:docMap.keySet()){
 			docList.add(docMap.get(s));
 		}
 		
-		Collections.sort(docList,Document.weightComparator);
+		Collections.sort(docList,WeightedDocument.weightComparator);
 		
 		for(int i=0;i<k;i++){
-			System.out.println(docList.get(i).getFileName()+"\t"+docList.get(i).getWeight());
+			System.out.println(docList.get(i).getName()+"\t"+docList.get(i).getWeight());
 		}
 	}
 }
