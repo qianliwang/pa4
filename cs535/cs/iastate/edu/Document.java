@@ -7,21 +7,30 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 public class Document {
 	
 	private HashMap<String,Integer> terms;
 	private String filePath;
-	private ArrayList<Float> weightVector;
+
+	private String fileName;
+	private double weight;
 	
 	public Document(String filePath){
 		this.terms = new HashMap<String,Integer>();
 		this.filePath = filePath;
 		preProcessing();
-		this.weightVector = new ArrayList<Float>();
+
+	}
+	
+	public Document(String fileName,double weight){
+		this.fileName = fileName;
+		this.weight = weight;
 	}
 	
 	public String getFilePath() {
@@ -33,12 +42,30 @@ public class Document {
 	}
 	
 	public String getFileName(){
-		File f = new File(this.filePath);
-		String fName = f.getName();
-		f = null;
-		return fName;
+		
+		String name;
+		
+		if(this.fileName!=null){
+			name = this.fileName;
+		}else if(this.filePath!=null){
+			File f = new File(this.filePath);
+			name = f.getName();
+			f = null;
+		}else{
+			name = null;
+		}
+		
+		return name;
 	}
 	
+	public double getWeight() {
+		return weight;
+	}
+
+	public void setWeight(double weight) {
+		this.weight = weight;
+	}
+
 	private void preProcessing(){
 		FileInputStream fstream;
 		BufferedReader br = null;
@@ -79,4 +106,18 @@ public class Document {
 		}
 
 	}
+	
+	public static Comparator<Document> weightComparator 
+    = new Comparator<Document>() {
+
+		public int compare(Document d1, Document d2) {
+
+			if (d1.getWeight() == d2.getWeight()){
+				return 0;
+			}
+			else{
+				return d1.getWeight() < d2.getWeight() ? 1 : -1;
+			}
+		}
+	};
 }
