@@ -39,6 +39,14 @@ public class IndexBuilder {
 		return posting;
 	}
 
+	public HashMap<String,Document> getDocumentMap(){
+		HashMap<String,Document> docMap = new HashMap<String,Document>();
+		for(Document d: this.docList){
+			docMap.put(d.getFileName(), d);
+		}
+		return docMap;
+	}
+	
 	private void buildIndex(String folderPath,HashMap<String,Integer> index,HashMap<String,ArrayList<String>> posting,ArrayList<Document> docList){
 		File folder = new File(folderPath);	
 		File[] listOfFiles = folder.listFiles();

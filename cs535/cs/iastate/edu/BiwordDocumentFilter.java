@@ -1,5 +1,6 @@
 package pa4.cs535.cs.iastate.edu;
 
+import java.io.File;
 import java.util.TreeSet;
 
 public class BiwordDocumentFilter {
@@ -23,8 +24,8 @@ public class BiwordDocumentFilter {
 	public BiwordDocumentFilter(int bitsPerElement,String filePath){
 		this.bitsPerElement = bitsPerElement;
 		this.filePath = filePath;
-		this.fileName = filePath;
-
+		File f = new File(this.filePath);
+		this.fileName = f.getName();
 	}
 	
 	public String getDocument(){

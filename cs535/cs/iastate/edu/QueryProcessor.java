@@ -15,16 +15,20 @@ public class QueryProcessor {
 	public QueryProcessor(String folderPath){
 		this.index = new IndexBuilder(folderPath);
 		this.filterMap = new HashMap<String,BiwordDocumentFilter>();
-		fillBiwordDocumentFilter(folderPath,filterMap);
+		HashMap<String,Document> docMap = this.index.getDocumentMap();
+		fillBiwordDocumentFilter(folderPath,filterMap,docMap);
 	}
 	
-	private void fillBiwordDocumentFilter(String folderPath,HashMap<String,BiwordDocumentFilter> filterMap){
+	private void fillBiwordDocumentFilter(String folderPath,HashMap<String,BiwordDocumentFilter> filterMap,HashMap<String,Document> docMap){
 		File folder = new File(folderPath);	
 		File[] listOfFiles = folder.listFiles();
 		
 		BiwordDocumentFilter filter;
+		Document d;
 		for(File f:listOfFiles){
 			filter = new BiwordDocumentFilter(BITSPERELEMENT,f.getAbsolutePath());
+			d = docMap.get(f.getName());
+			filter.addDocument(d);
 			filterMap.put(f.getName(), filter);
 		}
 	}
@@ -56,16 +60,51 @@ public class QueryProcessor {
 			}
 		}
 		
+		ArrayList<String> biwordList = new ArrayList<String>();
+		for(int i=0;i<tArray.length-1;i++){
+			biwordList.add(tArray[i]+" "+tArray[i+1]);
+		}
+		
 		ArrayList<WeightedDocument> docList = new ArrayList<WeightedDocument>();
 		
+		WeightedDocument wd;
+		BiwordDocumentFilter biDF;
+		int tempHit;
 		for(String s:docMap.keySet()){
-			docList.add(docMap.get(s));
+			wd = docMap.get(s);
+			biDF = this.filterMap.get(s);
+			tempHit = getBiwordHit(biDF,biwordList);
+			wd.setNumOfBiwordHit(tempHit);
+			docList.add(wd);
 		}
 		
 		Collections.sort(docList,WeightedDocument.weightComparator);
 		
-		for(int i=0;i<k;i++){
+		ArrayList<WeightedDocument> biwordWeightedList = new ArrayList<WeightedDocument>();
+		
+		int limit = Math.min(docList.size(), 2*k);
+		
+		System.out.println("*************Sorted By Weight*************");
+		
+		for(int i=0;i<limit;i++){
 			System.out.println(docList.get(i).getName()+"\t"+docList.get(i).getWeight());
+			biwordWeightedList.add(docList.get(i));
 		}
+		
+		Collections.sort(biwordWeightedList,WeightedDocument.biWordHitComparator);
+		System.out.println("*************Sorted By Biword Hit then*************");
+		for(int i=0;i<k;i++){
+			System.out.println(biwordWeightedList.get(i).getName()+"\t"+biwordWeightedList.get(i).getWeight()+"\t" + biwordWeightedList.get(i).getNumOfBiwordHit());
+		}
+	}
+	
+	private int getBiwordHit(BiwordDocumentFilter filter,ArrayList<String> biwordList){
+		int num = 0;
+		for(String s:biwordList){
+			if(filter.appears(s)){
+				num++;
+			}
+		}
+		return num;
 	}
 }

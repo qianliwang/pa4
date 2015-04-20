@@ -7,6 +7,7 @@ public class WeightedDocument {
 	private double weight;
 	
 	private double length;
+	private int numOfBiwordHit;
 	
 	public WeightedDocument(String fileName,double weight){
 		this.fileName = fileName;
@@ -33,6 +34,14 @@ public class WeightedDocument {
 		this.length = length;
 	}
 
+	public int getNumOfBiwordHit() {
+		return numOfBiwordHit;
+	}
+
+	public void setNumOfBiwordHit(int numOfBiwordHit) {
+		this.numOfBiwordHit = numOfBiwordHit;
+	}
+
 	public static Comparator<WeightedDocument> weightComparator 
     = new Comparator<WeightedDocument>() {
 
@@ -43,6 +52,19 @@ public class WeightedDocument {
 			}
 			else{
 				return d1.getWeight() < d2.getWeight() ? 1 : -1;
+			}
+		}
+	};
+	public static Comparator<WeightedDocument> biWordHitComparator 
+    = new Comparator<WeightedDocument>() {
+
+		public int compare(WeightedDocument d1, WeightedDocument d2) {
+
+			if (d1.getNumOfBiwordHit() == d2.getNumOfBiwordHit()){
+				return d1.getWeight() < d2.getWeight() ? 1 : -1;
+			}
+			else{
+				return d1.getNumOfBiwordHit() < d2.getNumOfBiwordHit() ? 1 : -1;
 			}
 		}
 	};
