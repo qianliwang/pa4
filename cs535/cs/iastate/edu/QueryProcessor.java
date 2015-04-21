@@ -46,11 +46,27 @@ public class QueryProcessor {
 		double weight;
 		double w;
 		String tempName;
-		for(String t:tArray){
-			tDocList = this.index.getWeights(t);
+		double queryWeight[] = new double[tArray.length];
+		int termFrequency;
+		double queryLength = 0;
+		for(int i=0;i<tArray.length;i++){
+			termFrequency = this.index.getIndex().get(tArray[i]);
+			queryWeight[i] = calcWeight(1,termFrequency,this.filterMap.keySet().size());
+			queryLength = queryLength + queryWeight[i]*queryWeight[i];
+		}
+		
+		queryLength = Math.sqrt(queryLength);
+		
+		for(int i=0;i<queryWeight.length;i++){
+			queryWeight[i] = queryWeight[i]/queryLength;
+		}
+		
+		for(int i=0;i<tArray.length;i++){
+			tDocList = this.index.getWeights(tArray[i]);
 			for(WeightedDocument d:tDocList){
 				tempName = d.getName();
 				weight = d.getWeight();
+				weight = weight*queryWeight[i];
 				if(docMap.containsKey(tempName)){
 					w = docMap.get(tempName).getWeight();
 					docMap.get(tempName).setWeight(w+weight);
@@ -106,5 +122,9 @@ public class QueryProcessor {
 			}
 		}
 		return num;
+	}
+	private double calcWeight(int tf_td,int df_t, int numOfDocs){
+		double weight = Math.log(1.0+tf_td)*Math.log10(numOfDocs/df_t);
+		return weight;
 	}
 }
