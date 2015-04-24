@@ -137,13 +137,21 @@ public class IndexBuilder {
 		double docLength;
 		
 		for(Document d:docList){
+			squareSum = 0;
 			tempDocName = d.getFileName();
 			for(String term:d.getTerms().keySet()){
 				termWeight = calcWeight(d.getTerms().get(term),index.get(term),this.numOfDocs);
 				squareSum = squareSum+termWeight*termWeight;
 			}
 			docLength = Math.sqrt(squareSum);
+//			System.out.println(d.getFileName()+" length : "+squareSum);
 			docLengthMap.put(tempDocName, docLength);
+		}
+	}
+	
+	public void PrintIndexPostings(){
+		for(String s: this.index.keySet()){
+			System.out.println(s+"\t"+this.index.get(s)+this.posting.get(s)+"\t");
 		}
 	}
 }
